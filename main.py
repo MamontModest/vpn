@@ -211,6 +211,7 @@ async def cmd_start(message: types.Message):
         url=pay_url
     )
     )
+    await asyncio.sleep(1)
     await message.answer('Оплатите с помощью qiwi\n\n',reply_markup=builder)
     builder = types.ReplyKeyboardMarkup(resize_keyboard=True)
     builder.insert(types.KeyboardButton(
