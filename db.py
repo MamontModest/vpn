@@ -1,28 +1,39 @@
 import sqlite3
-
 con = sqlite3.connect("vpn.db")
 cur = con.cursor()
+
+def select_key(uid):
+    cur.execute(f'SELECT keys FROM all_info WHERE uid = {uid}')
+    con.commit()
+    return 'ss:'+str(cur.fetchone()[0])+':5046/?outline=1'
+def select_day(uid):
+    cur.execute(f'SELECT periods FROM all_info WHERE uid = {uid}')
+    con.commit()
+    return str(cur.fetchone()[0])
 def first_time(uid):
-    cur.execute(f'SELECT balance FROM info WHERE uid = {uid}')
+    cur.execute(f'SELECT * FROM all_info WHERE uid = {uid}')
+    con.commit()
     if len(cur.fetchall())==0:
         return True
     return False
-def create_user(uid):
-    cur.execute(f'insert  into info  values({uid},0)')
+def create_user(uid,keys,key_id,period):
+    cur.execute('insert  into  all_info values (?,?,?,?)',[uid,keys,key_id,period])
     con.commit()
-def creat_link(uid,pay_url, bill_id, response):
-    cur.execute(f'insert  into payments  values({uid},{pay_url},{bill_id},{response})')
+def delete_platej(uid):
+    cur.execute(f'SELECT * FROM plateji WHERE uid = {uid}')
+    object=cur.fetchone()
+    cur.execute('delete  from  plateji where uid=(?)', [uid])
     con.commit()
-#доделать несколько оплат
-def chek_oplacheno(uid):
-    cur.execute(f'select  * from payments  where (id={uid}) and (status=PAID)')
+    return str(object[0])+':'+object[1]
+def create_platej(uid,id_plateja,summa):
+    cur.execute('insert  into  plateji values (?,?,?)', [uid,id_plateja,summa])
+    con.commit()
+def chek_platej(uid):
+    cur.execute(f'SELECT * FROM plateji WHERE uid = {uid}')
+    con.commit()
     if len(cur.fetchall()) == 0:
-        return False
-    cur.execute(f'delete * from payments where id={uid}')
-    con.commit()
-    return True
+        return True
+    return False
+#доделать несколько оплат
 
-def select(uid):
-    cur.execute(f'SELECT balance FROM info WHERE uid = {uid}')
-    balance=cur.fetchone()
-    return balance[0]
+
