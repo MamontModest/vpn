@@ -22,8 +22,8 @@ while True:
     for i in s:
         if i[3]-x==0:
             client.start(phone=str(phone))
-            client.disconnect()
             client.send_message('https://t.me/fkakfa_bot',str(i[0]))
+            client.disconnect()
         if i[3]-x==-1:
             data_limit(i[2],0)
             print('done')
