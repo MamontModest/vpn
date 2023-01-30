@@ -20,6 +20,7 @@ while True:
     con.close()
     x=times(datetime.datetime.today())
     for i in s:
+        time.sleep(2)
         if i[3]-x==0:
             client.start(phone=str(phone))
             client.send_message('https://t.me/fkakfa_bot',str(i[0]))
