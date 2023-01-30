@@ -23,7 +23,7 @@ while True:
         time.sleep(2)
         if i[3]-x==0:
             client.start(phone=str(phone))
-            client.send_message('https://t.me/fkakfa_bot',str(i[0]))
+            client.send_message('god_vpn_bot',str(i[0]))
             client.disconnect()
         if i[3]-x==-1:
             data_limit(i[2],0)
