@@ -12,7 +12,7 @@ qiwi_pay = QiwiConnection(api_key)
 con = sqlite3.connect("vpn.db")
 cur = con.cursor()
 
-bot = Bot(token="5688275649:AAHVh0Ghsrti3e3AnQuATFsvRVStBpsjXZA")
+bot = Bot(token="6160257601:AAGCEcutuXXja53FgllYo3qlXS1eHaMBAhM")
 dp = Dispatcher(bot)
 
 @dp.message_handler(commands=["start"])
@@ -341,6 +341,21 @@ Android: https://play.google.com/store/apps/details?id=org.outline.android.clien
 Теперь у вас есть доступ к свободному интернету. Чтобы убедиться, что вы подключились к серверу, введите в Google Поиске фразу "Какой у меня IP-адрес". IP-адрес, указанный в Google, должен совпадать с IP-адресом в клиенте Outline.
 
 Дополнительные сведения можно найти на странице https://getoutline.org/.""")
+
+@dp.message_handler()
+async def cmd_start(message: types.Message):
+    if message.from_user.id==5695880736:
+        print(int(message.text))
+        builder=types.InlineKeyboardMarkup()
+        builder.add(types.InlineKeyboardButton(
+            text='Продлить  пользование vpn',
+            callback_data='tariffs'))
+        await bot.send_message(chat_id=int(message.text),text='Остался один денёк vpn . Не забудь продлить',reply_markup=builder)
+
+    else:
+        await message.answer("У нас удобный интерфейс , ты можешь все сделать с помощью кнопок )")
+
+
 
 
 

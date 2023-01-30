@@ -13,6 +13,7 @@ con = sqlite3.connect("vpn.db")
 cur = con.cursor()
 while True:
     cur.execute('select * from plateji')
+    con.commit()
     time.sleep(5)
     for i in cur.fetchall():
         try:
@@ -82,6 +83,7 @@ while True:
                 pass
         except:
             print('eror')
+
 
 
 
