@@ -11,6 +11,7 @@ api_hash = 'e80eddcc8322873af477a85223fe5d57'
 username = 'dsafdafth'
 phone=77073292462
 client = TelegramClient(username, int(api_id), api_hash)
+print(times(datetime.datetime.today()),datetime.datetime.today())
 while True:
     con = sqlite3.connect("vpn.db")
     cur = con.cursor()
@@ -21,11 +22,11 @@ while True:
     x=times(datetime.datetime.today())
     for i in s:
         time.sleep(2)
-        if i[3]-x==0:
+        if i[3]-62==0:
             client.start(phone=str(phone))
             client.send_message('god_vpn_bot',str(i[0]))
             client.disconnect()
-        if i[3]-x==-1:
+        if i[3]-62==-1:
             data_limit(i[2],0)
             print('done')
     time.sleep(60*60*23.9)
