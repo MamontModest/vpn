@@ -12,7 +12,7 @@ qiwi_pay = QiwiConnection(api_key)
 con = sqlite3.connect("vpn.db")
 cur = con.cursor()
 
-bot = Bot(token="6160257601:AAGCEcutuXXja53FgllYo3qlXS1eHaMBAhM")
+bot = Bot(token="5688275649:AAHVh0Ghsrti3e3AnQuATFsvRVStBpsjXZA")
 dp = Dispatcher(bot)
 
 @dp.message_handler(commands=["start"])
