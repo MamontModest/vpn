@@ -1,6 +1,11 @@
 import sqlite3
 con = sqlite3.connect("vpn.db")
 cur = con.cursor()
+cur.execute('create table referal (uid,ref)')
+con.commit()
+cur.execute('select * from referal')
+print(cur.fetchall())
+con.commit()
 cur.execute('select * from all_info')
 print(cur.fetchall())
 cur.execute('select * from plateji')

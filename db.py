@@ -19,6 +19,9 @@ def first_time(uid):
 def create_user(uid,keys,key_id,period):
     cur.execute('insert  into  all_info values (?,?,?,?)',[uid,keys,key_id,period])
     con.commit()
+def create_ref(uid,ref):
+    cur.execute('insert  into  referal values (?,?)', [uid, ref])
+    con.commit()
 def delete_platej(uid):
     cur.execute(f'SELECT * FROM plateji WHERE uid = {uid}')
     object=cur.fetchone()

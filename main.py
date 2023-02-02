@@ -3,7 +3,7 @@ import asyncio
 from PyEasyQiwi import QiwiConnection
 import time
 import sqlite3
-from db import first_time,select_key,create_user,select_day,create_platej,chek_platej,delete_platej
+from db import first_time,select_key,create_user,select_day,create_platej,chek_platej,delete_platej,create_ref
 from clients import id_key,create_one,chek_all,data_limit,times
 
 api_key = "eyJ2ZXJzaW9uIjoiUDJQIiwiZGF0YSI6eyJwYXlpbl9tZXJjaGFudF9zaXRlX3VpZCI6IjJ0dDUyaS0wMCIsInVzZXJfaWQiOiI3OTgxMDE3ODcwNiIsInNlY3JldCI6ImY0Mzc4MDBhZDdlM2E3ZGUwYTcxNmEwN2QyY2JlZGFlYzE3NzIwMmFhYTU5NjI1NGM3MjQwZWVjN2Y5MThiMjQifX0="
@@ -12,13 +12,16 @@ qiwi_pay = QiwiConnection(api_key)
 con = sqlite3.connect("vpn.db")
 cur = con.cursor()
 
-bot = Bot(token="5688275649:AAHVh0Ghsrti3e3AnQuATFsvRVStBpsjXZA")
+bot = Bot(token="6160257601:AAGCEcutuXXja53FgllYo3qlXS1eHaMBAhM")
 dp = Dispatcher(bot)
 
 @dp.message_handler(commands=["start"])
 async def cmd_start(message: types.Message):
     if first_time(message.from_user.id):
         day_from_start=times(message.date)
+        if ' ' in message.text:
+            print(message.text.split()[1])
+            create_ref(message.from_user.id,message.text.split()[1])
         try:
             id, key = id_key(create_one())
             data_limit(id,40000000000)
