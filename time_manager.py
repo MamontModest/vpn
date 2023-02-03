@@ -22,11 +22,11 @@ while True:
     x=times(datetime.datetime.today())
     for i in s:
         time.sleep(2)
-        if i[3]-63==0:
+        if i[3]-64==0:
             client.start(phone=str(phone))
             client.send_message('god_vpn_bot',str(i[0]))
             client.disconnect()
-        if i[3]-63==-1:
+        if i[3]-64<0:
             data_limit(i[2],0)
             print('done')
     time.sleep(60*60*23.9)
