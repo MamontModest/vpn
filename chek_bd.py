@@ -1,6 +1,10 @@
 import sqlite3
 con = sqlite3.connect("vpn.db")
 cur = con.cursor()
+cur.execute('select * from dates')
+print('\n\n\n\ndates:')
+for i in cur.fetchall():
+    print(i)
 cur.execute('select * from users')
 print('\n\n\n\nusers:')
 for i in cur.fetchall():

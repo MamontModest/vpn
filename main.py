@@ -2,9 +2,10 @@ from aiogram import Bot, Dispatcher, types
 import asyncio
 from PyEasyQiwi import QiwiConnection
 import time
+from datetime import datetime,timedelta
 import sqlite3
-from db import first_time,select_key,create_user,select_day,create_platej,chek_platej,delete_platej,create_ref
-from clients import id_key,create_one,chek_all,data_limit,times
+from db import select_key,select_day,first_time,create_user,select_referal,create_user_ref,delete_platej,create_platej,chek_platej,cupon_payment,create_referal
+from clients import id_key,create_one,data_limit
 
 api_key = "eyJ2ZXJzaW9uIjoiUDJQIiwiZGF0YSI6eyJwYXlpbl9tZXJjaGFudF9zaXRlX3VpZCI6IjJ0dDUyaS0wMCIsInVzZXJfaWQiOiI3OTgxMDE3ODcwNiIsInNlY3JldCI6ImY0Mzc4MDBhZDdlM2E3ZGUwYTcxNmEwN2QyY2JlZGFlYzE3NzIwMmFhYTU5NjI1NGM3MjQwZWVjN2Y5MThiMjQifX0="
 qiwi_pay = QiwiConnection(api_key)
@@ -15,21 +16,16 @@ cur = con.cursor()
 bot = Bot(token="5688275649:AAHVh0Ghsrti3e3AnQuATFsvRVStBpsjXZA")
 dp = Dispatcher(bot)
 
+
+
 @dp.message_handler(commands=["start"])
 async def cmd_start(message: types.Message):
     if first_time(message.from_user.id):
-        day_from_start=times(message.date)
         if ' ' in message.text:
-            print(message.text.split()[1])
-            create_ref(message.from_user.id,message.text.split()[1])
-        try:
-            id, key = id_key(create_one())
-            data_limit(id,40000000000)
-            create_user(message.from_user.id,key,id,day_from_start+2)
-        except:
-            id, key = id_key(create_one())
-            data_limit(id, 40000000000)
-            create_user(message.from_user.id, key, id, day_from_start + 2)
+            flag ,tuple = select_referal(message.text.split()[1])
+            if flag == True:
+                create_user_ref(message.from_user.id,tuple[0],tuple[1],tuple[2],tuple[3])
+
         builder = types.InlineKeyboardMarkup()
         builder.add(types.InlineKeyboardButton(
             text="Да!",
@@ -66,6 +62,12 @@ async def cmd_start(message: types.Message):
         await message.answer("Вы в главном меню", reply_markup=builder)
 
 
+@dp.message_handler(text="Создать рефералку")
+async def cmd_start(message: types.Message):
+    if message.from_user.id == 1890767310 or message.from_user.id==3727766:
+        await message.answer('Введи  в формате \nreferal_nickname/percent_referal/kolichestvo_platejei/user_percent')
+
+
 
 @dp.callback_query_handler(text='try_yes')
 async def cmd_start(callback: types.CallbackQuery):
@@ -85,23 +87,41 @@ async def cmd_start(callback: types.CallbackQuery):
 
 
 
+
+
+
 @dp.callback_query_handler(text='what_next')
 async def cmd_start(callback: types.CallbackQuery):
-    key=select_key(callback.from_user.id)
-    builder = types.InlineKeyboardMarkup()
-    builder.add(types.InlineKeyboardButton(
-        text="Супер",
-        callback_data="main_menu")
-    )
-    await callback.message.answer("`"+str(key)+"`",parse_mode='MarkdownV2')
-    await asyncio.sleep(3)
-    await callback.message.answer("Инструкция для подключения.\n1)Скопируйте этот ключ (можно клацнуть на него)\n2) Откройте приложение Outline\n3)Вам предложит вставить скопированный\nтекст из телеграма, соглашайтесь!\n4) Нажимайте 'Connect'\n5) Поздравляем, вы в интернете!",reply_markup=builder)
+    if first_time(callback.from_user.id):
+        day_from_start=(datetime.strptime(str(callback.message.date).split()[0],"%Y-%m-%d")+timedelta(days=2)).strftime("%Y-%m-%d")
+        print(day_from_start)
+        id, key = id_key(create_one())
+        data_limit(id, 40000000000)
+        create_user(callback.from_user.id, key, id, day_from_start)
+        key=select_key(callback.from_user.id)
+        builder = types.InlineKeyboardMarkup()
+        builder.add(types.InlineKeyboardButton(
+            text="Супер",
+            callback_data="main_menu")
+        )
+        await callback.message.answer("`"+str(key)+"`",parse_mode='MarkdownV2')
+        await asyncio.sleep(3)
+        await callback.message.answer("Инструкция для подключения.\n1)Скопируйте этот ключ (можно клацнуть на него)\n2) Откройте приложение Outline\n3)Вам предложит вставить скопированный\nтекст из телеграма, соглашайтесь!\n4) Нажимайте 'Connect'\n5) Поздравляем, вы в интернете!",reply_markup=builder)
+
+
+
 
 @dp.callback_query_handler(text='tariffs')
 async def cmd_start(callback: types.CallbackQuery):
+    if first_time(callback.from_user.id):
+        day_from_start=(datetime.strptime(str(callback.message.date).split()[0],"%Y-%m-%d")+timedelta(days=2)).strftime("%Y-%m-%d")
+        print(day_from_start)
+        id, key = id_key(create_one())
+        data_limit(id, 40000000000)
+        create_user(callback.from_user.id, key, id, day_from_start)
     builder = types.ReplyKeyboardMarkup(resize_keyboard=True)
     builder.row(types.InlineKeyboardButton(
-        text="Месяц - 149 рублей",
+        text="Месяц  - 149 рублей",
         callback_data="first")
     )
     builder.insert(types.InlineKeyboardButton(
@@ -117,6 +137,11 @@ async def cmd_start(callback: types.CallbackQuery):
         callback_data="what_next")
     )
     await callback.message.answer("Выбирайте любой удобный вариант:",reply_markup=builder)
+
+
+
+
+
 @dp.message_handler(text='Тарифы')
 async def cmd_start(message: types.Message):
     builder = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -137,11 +162,23 @@ async def cmd_start(message: types.Message):
         callback_data="what_next")
     )
     await message.answer("Выбирайте любой удобный вариант:",reply_markup=builder)
+
+
+
+
+
+
 @dp.message_handler(text='Мой ключ')
 async def cmd_start(message: types.Message):
+    if first_time(message.from_user.id):
+        day_from_start=(datetime.strptime(str(message.date).split()[0],"%Y-%m-%d")+timedelta(days=2)).strftime("%Y-%m-%d")
+        print(day_from_start)
+        id, key = id_key(create_one())
+        data_limit(id, 40000000000)
+        create_user(message.from_user.id, key, id, day_from_start)
     key = select_key(message.from_user.id)
-    day =max(0,int(select_day(message.from_user.id))-times(message.date))
-    await message.answer("Ваш ключ:"+"`"+str(key)+"`"+'\nОсталось дней : '+str(day),parse_mode='MarkdownV2')
+    day =select_day(message.from_user.id)
+    await message.answer("Ваш ключ:"+"`"+str(key)+"`"+'\nПодписка активна до  : '+day,parse_mode='MarkdownV2')
 
 
 
@@ -169,7 +206,14 @@ async def cmd_start(callback: types.CallbackQuery):
         text="Инструкция\n",
         callback_data="instruction")
     )
+    if callback.from_user.id == 1890767310:
+        builder.insert(types.KeyboardButton(text="Создать рефералку"))
     await callback.message.answer("Вы в главном меню", reply_markup=builder)
+
+
+
+
+
 
 @dp.message_handler(text='Главное меню')
 async def cmd_start(message: types.Message):
@@ -194,19 +238,30 @@ async def cmd_start(message: types.Message):
         text="Инструкция\n",
         callback_data="instruction")
     )
+    if message.from_user.id == 1890767310:
+        builder.insert(types.KeyboardButton(text="Создать рефералку"))
     await message.answer("Вы в главном меню", reply_markup=builder)
+
+
+
+
+
 
 @dp.message_handler(text="Месяц  - 149 рублей")
 async def cmd_start(message: types.Message):
     uid=message.from_user.id
     if   chek_platej(uid):
-        pay_url, bill_id, response = qiwi_pay.create_bill(value=146.00, description=str(message.from_user.id),theme_code='Egor-ChYZVzq4Ixq')
-        create_platej(uid,bill_id.split(':')[1],149)
+        cupon=cupon_payment(message.from_user.id)
+        value=round(149*0.98*(100-cupon)/100)
+        pay_url, bill_id, response = qiwi_pay.create_bill(value=value, description=str(message.from_user.id),theme_code='Egor-ChYZVzq4Ixq')
+        create_platej(uid,bill_id.split(':')[1],1)
         print('create_first')
     else:
         qiwi_pay.remove_bill(delete_platej(uid))
-        pay_url, bill_id, response = qiwi_pay.create_bill(value=146.00, description=str(message.from_user.id),theme_code='Egor-ChYZVzq4Ixq')
-        create_platej(uid, bill_id.split(':')[1], 149)
+        cupon = cupon_payment(message.from_user.id)
+        value = round(149 * 0.98 * (100-cupon)/ 100)
+        pay_url, bill_id, response = qiwi_pay.create_bill(value=value, description=str(message.from_user.id),theme_code='Egor-ChYZVzq4Ixq')
+        create_platej(uid, bill_id.split(':')[1], 1)
         print('create_second')
     builder = types.InlineKeyboardMarkup(resize_keyboard=True)
     builder.add(types.InlineKeyboardButton(
@@ -224,19 +279,31 @@ async def cmd_start(message: types.Message):
         text="Главное меню",
         callback_data="what_next")
     )
-    await asyncio.sleep(5)
+    await asyncio.sleep(3)
     await message.answer('Как только вы оплатите счёт, vpn автоматически продлится',reply_markup=builder)
+
+
+
+
+
+
 @dp.message_handler(text="3 Месяца - 349 рублей")
 async def cmd_start(message: types.Message):
-    uid=message.from_user.id
-    if   chek_platej(uid):
-        pay_url, bill_id, response = qiwi_pay.create_bill(value=340.00, description=str(message.from_user.id),theme_code='Egor-ChYZVzq4Ixq')
-        create_platej(uid,bill_id.split(':')[1],349)
+    uid = message.from_user.id
+    if chek_platej(uid):
+        cupon = cupon_payment(message.from_user.id)
+        value = round(349 * 0.98 * (100-cupon)/ 100)
+        pay_url, bill_id, response = qiwi_pay.create_bill(value=value, description=str(message.from_user.id),
+                                                          theme_code='Egor-ChYZVzq4Ixq')
+        create_platej(uid, bill_id.split(':')[1], 3)
         print('create_first')
     else:
         qiwi_pay.remove_bill(delete_platej(uid))
-        pay_url, bill_id, response = qiwi_pay.create_bill(value=340.00, description=str(message.from_user.id),theme_code='Egor-ChYZVzq4Ixq')
-        create_platej(uid, bill_id.split(':')[1], 349)
+        cupon = cupon_payment(message.from_user.id)
+        value = round(349 * 0.98 * (100-cupon)/ 100)
+        pay_url, bill_id, response = qiwi_pay.create_bill(value=value, description=str(message.from_user.id),
+                                                          theme_code='Egor-ChYZVzq4Ixq')
+        create_platej(uid, bill_id.split(':')[1], 3)
         print('create_second')
     builder = types.InlineKeyboardMarkup(resize_keyboard=True)
     builder.add(types.InlineKeyboardButton(
@@ -256,17 +323,29 @@ async def cmd_start(message: types.Message):
     )
     await asyncio.sleep(5)
     await message.answer('Как только вы оплатите счёт, vpn автоматически продлится', reply_markup=builder)
+
+
+
+
+
+
 @dp.message_handler(text="Целый год - 999 рублей")
 async def cmd_start(message: types.Message):
-    uid=message.from_user.id
-    if   chek_platej(uid):
-        pay_url, bill_id, response = qiwi_pay.create_bill(value=973.00, description=str(message.from_user.id),theme_code='Egor-ChYZVzq4Ixq')
-        create_platej(uid,bill_id.split(':')[1],999)
+    uid = message.from_user.id
+    if chek_platej(uid):
+        cupon = cupon_payment(message.from_user.id)
+        value = round(999 * 0.98 * (100 - cupon) / 100)
+        pay_url, bill_id, response = qiwi_pay.create_bill(value=value, description=str(message.from_user.id),
+                                                          theme_code='Egor-ChYZVzq4Ixq')
+        create_platej(uid, bill_id.split(':')[1], 12)
         print('create_first')
     else:
         qiwi_pay.remove_bill(delete_platej(uid))
-        pay_url, bill_id, response = qiwi_pay.create_bill(value=973.00, description=str(message.from_user.id), theme_code='Egor-ChYZVzq4Ixq')
-        create_platej(uid, bill_id.split(':')[1], 999)
+        cupon = cupon_payment(message.from_user.id)
+        value = round(999 * 0.98 * (100 - cupon) / 100)
+        pay_url, bill_id, response = qiwi_pay.create_bill(value=value, description=str(message.from_user.id),
+                                                          theme_code='Egor-ChYZVzq4Ixq')
+        create_platej(uid, bill_id.split(':')[1], 12)
         print('create_second')
     builder = types.InlineKeyboardMarkup(resize_keyboard=True)
     builder.add(types.InlineKeyboardButton(
@@ -286,6 +365,10 @@ async def cmd_start(message: types.Message):
     )
     await asyncio.sleep(5)
     await message.answer('Как только вы оплатите счёт, vpn автоматически продлится', reply_markup=builder)
+
+
+
+
 @dp.message_handler(text='FAQ')
 async def cmd_start(message: types.Message):
     await message.answer("""Что такое VPN и зачем оно мне?
@@ -323,7 +406,7 @@ VPN это виртуальная частная сеть которая, исп
 @dp.message_handler(text='Поддержка')
 async def cmd_start(message: types.Message):
     await message.answer("""Перед тем как задать вопрос, обязательно прочитайте подробную инструкцию и раздел FAQ.
-Для ускорения решения технических вопросов, можете сразу прислать скриншот с открытым приложением Outline и сообщение от бота из раздела "Мой тариф".
+Для ускорения решения технических вопросов, можете сразу прислать скриншот с открытым приложением Outline и сообщение от бота из раздела "Мой ключ".
 Ваши вопросы и обращения направлять сюда @gkorkots """)
 
 @dp.message_handler(text='Инструкция')
@@ -345,16 +428,26 @@ Android: https://play.google.com/store/apps/details?id=org.outline.android.clien
 
 Дополнительные сведения можно найти на странице https://getoutline.org/.""")
 
+
+
+
 @dp.message_handler()
 async def cmd_start(message: types.Message):
-    if message.from_user.id==5695880736:
+    if message.from_user.id==1890767310 or message.from_user.id==3727766:
+        try:
+            referal_nickname,percent_referal,kolichestvo_platejei,user_percent=map(str,message.text.split('/'))
+            kolichestvo_platejei,user_percent,percent_referal=int(kolichestvo_platejei),int(user_percent),int(percent_referal)
+            create_referal(referal_nickname,percent_referal,kolichestvo_platejei,user_percent)
+            await message.answer(text='Всё круто')
+        except:
+            await message.answer(text='Ты где-то допустил ошибку или опечатку')
+    elif message.from_user.id==5695880736:
         print(int(message.text))
         builder=types.InlineKeyboardMarkup()
         builder.add(types.InlineKeyboardButton(
             text='Продлить  пользование vpn',
             callback_data='tariffs'))
-        await bot.send_message(chat_id=int(message.text),text='Остался один денёк vpn . Не забудь продлить',reply_markup=builder)
-
+        await bot.send_message(chat_id=int(message.text),text='Остался один денёк vpn . Вы можете продлить пользование vpn',reply_markup=builder)
     else:
         await message.answer("У нас удобный интерфейс , ты можешь все сделать с помощью кнопок )")
 

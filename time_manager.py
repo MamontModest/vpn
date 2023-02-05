@@ -16,9 +16,11 @@ while True:
     day_before=(datetime.today() - timedelta(days=1)).strftime("%Y-%m-%d")
     con = sqlite3.connect("vpn.db")
     cur = con.cursor()
-    cur.execute(f'select * from dates where napomni=={nw_day} ')
+    cur.execute('select * from dates where napomni=(?) ',[nw_day])
+    object=cur.fetchall()
     con.commit()
-    if len(cur.fetchall())==0:
+    print(object)
+    if len(object)==0:
         print(nw_day,day_before)
         con = sqlite3.connect("vpn.db")
         cur = con.cursor()
