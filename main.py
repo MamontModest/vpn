@@ -444,6 +444,7 @@ async def cmd_start(message: types.Message):
             text='Продлить  пользование vpn',
             callback_data='tariffs'))
         await bot.send_message(chat_id=int(message.text),text='Остался один денёк vpn . Вы можете продлить пользование vpn',reply_markup=builder)
+        await message.answer(f"done {message.text}")
     else:
         await message.answer("У нас удобный интерфейс , ты можешь все сделать с помощью кнопок )")
 
