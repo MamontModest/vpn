@@ -1,9 +1,6 @@
 import paramiko
 
-def times(x):
-    a=str(x).split()[0]
-    day=int((int(a.split('-')[0]) - 2023) * 365 + int(a.split('-')[1]) * 30 + int(a.split('-')[2]))
-    return day
+
 def id_key(link):
     try:
         link=str(link).split()[0][2:]
@@ -21,6 +18,7 @@ def id_key(link):
         return int(id[1][1:-1]),(accessUrl[2])
     except:
         return False,False
+
 def chek_all():
     host = '46.151.26.65'
     user = 'root'
@@ -33,6 +31,7 @@ def chek_all():
     data = stdout.read() + stderr.read()
     client.close()
     return data
+
 def create_one():
     host = '46.151.26.65'
     user = 'root'
@@ -45,6 +44,7 @@ def create_one():
     data = stdout.read() + stderr.read()
     client.close()
     return data
+
 def delete_one(id):
     host = '46.151.26.65'
     user = 'root'
@@ -57,6 +57,7 @@ def delete_one(id):
     data = stdout.read() + stderr.read()
     client.close()
     return data
+
 def data_limit(id,limit):
     host = '46.151.26.65'
     user = 'root'
