@@ -19,7 +19,6 @@ while True:
     cur.execute('select * from dates where napomni=(?) ',[nw_day])
     object=cur.fetchall()
     con.commit()
-    print(object)
     if len(object)==0:
         print(nw_day,day_before)
         con = sqlite3.connect("vpn.db")
@@ -29,16 +28,15 @@ while True:
         s = cur.fetchall()
         con.close()
         for i in s:
-            print(i)
             time.sleep(2)
             if i[3]==nw_day:
                 client.start(phone=str(phone))
                 client.send_message('god_vpn_bot',str(i[0]))
                 client.disconnect()
-                print('send')
+                print('send',i[0])
             elif i[3]==day_before:
                 data_limit(i[2],0)
-                print('done')
+                print('done',i[0])
         con = sqlite3.connect("vpn.db")
         cur = con.cursor()
         cur.execute('insert into dates values(?,?)',[nw_day,day_before])

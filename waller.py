@@ -15,7 +15,6 @@ while True:
     for i in cur.fetchall():
         try:
             status,responce=qiwi.check_bill(str(i[0])+':'+i[1])
-            print(status,responce)
             uid = i[0]
             if status == 'PAID':
                 for_month = i[2]

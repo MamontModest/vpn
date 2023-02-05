@@ -94,7 +94,6 @@ async def cmd_start(callback: types.CallbackQuery):
 async def cmd_start(callback: types.CallbackQuery):
     if first_time(callback.from_user.id):
         day_from_start=(datetime.strptime(str(callback.message.date).split()[0],"%Y-%m-%d")+timedelta(days=2)).strftime("%Y-%m-%d")
-        print(day_from_start)
         id, key = id_key(create_one())
         data_limit(id, 40000000000)
         create_user(callback.from_user.id, key, id, day_from_start)
@@ -115,7 +114,6 @@ async def cmd_start(callback: types.CallbackQuery):
 async def cmd_start(callback: types.CallbackQuery):
     if first_time(callback.from_user.id):
         day_from_start=(datetime.strptime(str(callback.message.date).split()[0],"%Y-%m-%d")+timedelta(days=2)).strftime("%Y-%m-%d")
-        print(day_from_start)
         id, key = id_key(create_one())
         data_limit(id, 40000000000)
         create_user(callback.from_user.id, key, id, day_from_start)
@@ -172,7 +170,6 @@ async def cmd_start(message: types.Message):
 async def cmd_start(message: types.Message):
     if first_time(message.from_user.id):
         day_from_start=(datetime.strptime(str(message.date).split()[0],"%Y-%m-%d")+timedelta(days=2)).strftime("%Y-%m-%d")
-        print(day_from_start)
         id, key = id_key(create_one())
         data_limit(id, 40000000000)
         create_user(message.from_user.id, key, id, day_from_start)
@@ -255,14 +252,14 @@ async def cmd_start(message: types.Message):
         value=round(149*0.98*(100-cupon)/100)
         pay_url, bill_id, response = qiwi_pay.create_bill(value=value, description=str(message.from_user.id),theme_code='Egor-ChYZVzq4Ixq')
         create_platej(uid,bill_id.split(':')[1],1)
-        print('create_first')
+        print('create_first',uid)
     else:
         qiwi_pay.remove_bill(delete_platej(uid))
         cupon = cupon_payment(message.from_user.id)
         value = round(149 * 0.98 * (100-cupon)/ 100)
         pay_url, bill_id, response = qiwi_pay.create_bill(value=value, description=str(message.from_user.id),theme_code='Egor-ChYZVzq4Ixq')
         create_platej(uid, bill_id.split(':')[1], 1)
-        print('create_second')
+        print('create_second',uid)
     builder = types.InlineKeyboardMarkup(resize_keyboard=True)
     builder.add(types.InlineKeyboardButton(
         text="Ссылка на оплату ",
@@ -296,7 +293,7 @@ async def cmd_start(message: types.Message):
         pay_url, bill_id, response = qiwi_pay.create_bill(value=value, description=str(message.from_user.id),
                                                           theme_code='Egor-ChYZVzq4Ixq')
         create_platej(uid, bill_id.split(':')[1], 3)
-        print('create_first')
+        print('create_first',uid)
     else:
         qiwi_pay.remove_bill(delete_platej(uid))
         cupon = cupon_payment(message.from_user.id)
@@ -304,7 +301,7 @@ async def cmd_start(message: types.Message):
         pay_url, bill_id, response = qiwi_pay.create_bill(value=value, description=str(message.from_user.id),
                                                           theme_code='Egor-ChYZVzq4Ixq')
         create_platej(uid, bill_id.split(':')[1], 3)
-        print('create_second')
+        print('create_second',uid)
     builder = types.InlineKeyboardMarkup(resize_keyboard=True)
     builder.add(types.InlineKeyboardButton(
         text="Ссылка на оплату ",
@@ -338,7 +335,7 @@ async def cmd_start(message: types.Message):
         pay_url, bill_id, response = qiwi_pay.create_bill(value=value, description=str(message.from_user.id),
                                                           theme_code='Egor-ChYZVzq4Ixq')
         create_platej(uid, bill_id.split(':')[1], 12)
-        print('create_first')
+        print('create_first',uid)
     else:
         qiwi_pay.remove_bill(delete_platej(uid))
         cupon = cupon_payment(message.from_user.id)
@@ -346,7 +343,7 @@ async def cmd_start(message: types.Message):
         pay_url, bill_id, response = qiwi_pay.create_bill(value=value, description=str(message.from_user.id),
                                                           theme_code='Egor-ChYZVzq4Ixq')
         create_platej(uid, bill_id.split(':')[1], 12)
-        print('create_second')
+        print('create_second',uid)
     builder = types.InlineKeyboardMarkup(resize_keyboard=True)
     builder.add(types.InlineKeyboardButton(
         text="Ссылка на оплату ",
@@ -442,7 +439,6 @@ async def cmd_start(message: types.Message):
         except:
             await message.answer(text='Ты где-то допустил ошибку или опечатку')
     elif message.from_user.id==5695880736:
-        print(int(message.text))
         builder=types.InlineKeyboardMarkup()
         builder.add(types.InlineKeyboardButton(
             text='Продлить  пользование vpn',
