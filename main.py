@@ -205,7 +205,7 @@ async def cmd_start(callback: types.CallbackQuery):
         text="Инструкция\n",
         callback_data="instruction")
     )
-    if callback.from_user.id == 1890767310:
+    if callback.from_user.id == 1890767310 or message.from_user.id==3727766:
         builder.insert(types.KeyboardButton(text="Создать рефералку"))
     await callback.message.answer("Вы в главном меню", reply_markup=builder)
 
@@ -237,7 +237,7 @@ async def cmd_start(message: types.Message):
         text="Инструкция\n",
         callback_data="instruction")
     )
-    if message.from_user.id == 1890767310:
+    if message.from_user.id == 1890767310 or message.from_user.id==3727766:
         builder.insert(types.KeyboardButton(text="Создать рефералку"))
     await message.answer("Вы в главном меню", reply_markup=builder)
 
