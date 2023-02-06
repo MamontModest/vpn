@@ -103,7 +103,7 @@ async def cmd_start(callback: types.CallbackQuery):
             text="Супер",
             callback_data="main_menu")
         )
-        await callback.message.answer("`"+str(key)+"`",parse_mode='MarkdownV2')
+        await callback.message.answer('Ваш пробный период активирован, осталось 48 часов\n'+ "`"+str(key)+"`",parse_mode='MarkdownV2')
         await asyncio.sleep(3)
         await callback.message.answer("Инструкция для подключения.\n1)Скопируйте этот ключ (можно клацнуть на него)\n2) Откройте приложение Outline\n3)Вам предложит вставить скопированный\nтекст из телеграма, соглашайтесь!\n4) Нажимайте 'Connect'\n5) Поздравляем, вы в интернете!",reply_markup=builder)
 
@@ -117,6 +117,7 @@ async def cmd_start(callback: types.CallbackQuery):
         id, key = id_key(create_one())
         data_limit(id, 40000000000)
         create_user(callback.from_user.id, key, id, day_from_start)
+        await callback.message.answer('Ваш пробный период активирован, осталось 48 часов\nКлюч можно получить в Главном меню / Мой ключ')
     builder = types.ReplyKeyboardMarkup(resize_keyboard=True)
     builder.row(types.InlineKeyboardButton(
         text="Месяц  - 149 рублей",
@@ -173,8 +174,9 @@ async def cmd_start(message: types.Message):
         id, key = id_key(create_one())
         data_limit(id, 40000000000)
         create_user(message.from_user.id, key, id, day_from_start)
+        await message.answer('Ваш пробный период активирован, осталось 48 часов\n')
     key = select_key(message.from_user.id)
-    day =select_day(message.from_user.id)
+    day = select_day(message.from_user.id)
     await message.answer("Ваш ключ:"+"`"+str(key)+"`"+'\nПодписка активна до  : '+day,parse_mode='MarkdownV2')
 
 
