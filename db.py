@@ -6,9 +6,10 @@ def select_key(uid):
     con = sqlite3.connect("vpn.db")
     cur = con.cursor()
     cur.execute(f'SELECT keys FROM users WHERE uid = {uid}')
+    object=cur.fetchone()[0]
     con.commit()
     con.close()
-    return 'ss:'+str(cur.fetchone()[0])+':5046/?outline=1'
+    return 'ss:'+str(object)+':5046/?outline=1'
 
 def select_day(uid):
     con = sqlite3.connect("vpn.db")
