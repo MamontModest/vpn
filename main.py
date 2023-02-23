@@ -1,20 +1,25 @@
 from aiogram import Bot, Dispatcher, types
 import asyncio
-from PyEasyQiwi import QiwiConnection
-import time
 from datetime import datetime,timedelta
-import sqlite3
-from db import select_key,select_day,first_time,create_user,select_referal,create_user_ref,delete_platej,create_platej,chek_platej,cupon_payment,create_referal
+from db import select_key,select_day,first_time,create_user,select_referal,create_user_ref,cupon_payment,create_referal
 from clients import id_key,create_one,data_limit
+import configparser
+from yookassa import Configuration, Payment
+import uuid
+import json
+config = configparser.ConfigParser()
+config.read('keys.ini')
 
-api_key = "eyJ2ZXJzaW9uIjoiUDJQIiwiZGF0YSI6eyJwYXlpbl9tZXJjaGFudF9zaXRlX3VpZCI6IjJ0dDUyaS0wMCIsInVzZXJfaWQiOiI3OTgxMDE3ODcwNiIsInNlY3JldCI6ImY0Mzc4MDBhZDdlM2E3ZGUwYTcxNmEwN2QyY2JlZGFlYzE3NzIwMmFhYTU5NjI1NGM3MjQwZWVjN2Y5MThiMjQifX0="
-qiwi_pay = QiwiConnection(api_key)
+Configuration.account_id = config['YOUKASSA']['account_id']
+Configuration.secret_key = config['YOUKASSA']['secret_key']
 
-con = sqlite3.connect("vpn.db")
-cur = con.cursor()
 
-bot = Bot(token="5815956579:AAFX-wfNk-PgvM-zO9yLbiPb4rhFrfrMWVY")
+
+bot = Bot(token=config['BOT']['token'])
 dp = Dispatcher(bot)
+
+
+
 
 
 
@@ -205,7 +210,7 @@ async def cmd_start(callback: types.CallbackQuery):
         text="Инструкция\n",
         callback_data="instruction")
     )
-    if callback.from_user.id == 1890767310 or message.from_user.id==3727766:
+    if callback.from_user.id == 1890767310 or callback.from_user.id==3727766:
         builder.insert(types.KeyboardButton(text="Создать рефералку"))
     await callback.message.answer("Вы в главном меню", reply_markup=builder)
 
@@ -248,20 +253,25 @@ async def cmd_start(message: types.Message):
 
 @dp.message_handler(text="Месяц  - 149 рублей")
 async def cmd_start(message: types.Message):
-    uid=message.from_user.id
-    if   chek_platej(uid):
-        cupon=cupon_payment(message.from_user.id)
-        value=round(149*0.98*(100-cupon)/100)
-        pay_url, bill_id, response = qiwi_pay.create_bill(value=value, description=str(message.from_user.id),theme_code='Egor-ChYZVzq4Ixq')
-        create_platej(uid,bill_id.split(':')[1],1)
-        print('create_first',uid)
-    else:
-        qiwi_pay.remove_bill(delete_platej(uid))
-        cupon = cupon_payment(message.from_user.id)
-        value = round(149 * 0.98 * (100-cupon)/ 100)
-        pay_url, bill_id, response = qiwi_pay.create_bill(value=value, description=str(message.from_user.id),theme_code='Egor-ChYZVzq4Ixq')
-        create_platej(uid, bill_id.split(':')[1], 1)
-        print('create_second',uid)
+    uid = message.from_user.id
+    cupon = cupon_payment(uid)
+    value = int(1 * (100 - cupon) / 100)
+    payment = Payment.create(
+        {"amount": {
+            "value": value,
+            "currency": "RUB"
+        },
+            "confirmation": {
+                "type": "redirect",
+                "return_url": "https://t.me/god_vpn_bot"
+            },
+            "capture": True,
+            "description": str(uid)+'-1month',
+        }, uuid.uuid4())
+    pay_url = json.loads(payment.json())['confirmation']['confirmation_url']
+
+
+
     builder = types.InlineKeyboardMarkup(resize_keyboard=True)
     builder.add(types.InlineKeyboardButton(
         text="Ссылка на оплату ",
@@ -289,21 +299,23 @@ async def cmd_start(message: types.Message):
 @dp.message_handler(text="3 Месяца - 349 рублей")
 async def cmd_start(message: types.Message):
     uid = message.from_user.id
-    if chek_platej(uid):
-        cupon = cupon_payment(message.from_user.id)
-        value = round(349 * 0.98 * (100-cupon)/ 100)
-        pay_url, bill_id, response = qiwi_pay.create_bill(value=value, description=str(message.from_user.id),
-                                                          theme_code='Egor-ChYZVzq4Ixq')
-        create_platej(uid, bill_id.split(':')[1], 3)
-        print('create_first',uid)
-    else:
-        qiwi_pay.remove_bill(delete_platej(uid))
-        cupon = cupon_payment(message.from_user.id)
-        value = round(349 * 0.98 * (100-cupon)/ 100)
-        pay_url, bill_id, response = qiwi_pay.create_bill(value=value, description=str(message.from_user.id),
-                                                          theme_code='Egor-ChYZVzq4Ixq')
-        create_platej(uid, bill_id.split(':')[1], 3)
-        print('create_second',uid)
+    cupon = cupon_payment(uid)
+    value = int(349 * (100 - cupon) / 100)
+    payment = Payment.create(
+        {"amount": {
+            "value": value,
+            "currency": "RUB"
+        },
+            "confirmation": {
+                "type": "redirect",
+                "return_url": "https://t.me/god_vpn_bot"
+            },
+            "capture": True,
+            "description": str(uid)+'-3month',
+        }, uuid.uuid4())
+    pay_url=json.loads(payment.json())['confirmation']['confirmation_url']
+
+
     builder = types.InlineKeyboardMarkup(resize_keyboard=True)
     builder.add(types.InlineKeyboardButton(
         text="Ссылка на оплату ",
@@ -331,21 +343,23 @@ async def cmd_start(message: types.Message):
 @dp.message_handler(text="Целый год - 999 рублей")
 async def cmd_start(message: types.Message):
     uid = message.from_user.id
-    if chek_platej(uid):
-        cupon = cupon_payment(message.from_user.id)
-        value = round(999 * 0.98 * (100 - cupon) / 100)
-        pay_url, bill_id, response = qiwi_pay.create_bill(value=value, description=str(message.from_user.id),
-                                                          theme_code='Egor-ChYZVzq4Ixq')
-        create_platej(uid, bill_id.split(':')[1], 12)
-        print('create_first',uid)
-    else:
-        qiwi_pay.remove_bill(delete_platej(uid))
-        cupon = cupon_payment(message.from_user.id)
-        value = round(999 * 0.98 * (100 - cupon) / 100)
-        pay_url, bill_id, response = qiwi_pay.create_bill(value=value, description=str(message.from_user.id),
-                                                          theme_code='Egor-ChYZVzq4Ixq')
-        create_platej(uid, bill_id.split(':')[1], 12)
-        print('create_second',uid)
+    uid = message.from_user.id
+    cupon = cupon_payment(uid)
+    value = int(999 * (100 - cupon) / 100)
+    payment = Payment.create(
+        {"amount": {
+            "value": value,
+            "currency": "RUB"
+        },
+            "confirmation": {
+                "type": "redirect",
+                "return_url": "https://t.me/god_vpn_bot"
+            },
+            "capture": True,
+            "description": str(uid)+'-12month',
+        }, uuid.uuid4())
+    pay_url = json.loads(payment.json())['confirmation']['confirmation_url']
+
     builder = types.InlineKeyboardMarkup(resize_keyboard=True)
     builder.add(types.InlineKeyboardButton(
         text="Ссылка на оплату ",

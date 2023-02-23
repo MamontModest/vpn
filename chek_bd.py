@@ -25,3 +25,4 @@ cur.execute('select * from active_payments')
 print('\n\n\n\nactive_payments:')
 for i in cur.fetchall():
     print(i)
+con.close()
