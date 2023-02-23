@@ -6,6 +6,7 @@ app = Flask(__name__)
 
 @app.route('/',methods=['POST'])
 def hello_world():
+    print(request.remote_addr)
     if request.remote_addr in ['127.0.0.1','185.71.76.0','185.71.76.27','185.71.77.27','185.71.77.0','77.75.153.25','77.75.153.0','77.75.156.11','77.75.156.35','77.75.154.25','77.75.154.128','2a02:5180::/32']:
         if request.json['event']=='payment.succeeded':
             listik = request.json['object']['description'].split('-')
